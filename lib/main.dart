@@ -3,6 +3,7 @@ import 'package:regexpattern/regexpattern.dart';
 import 'dart:ui';
 
 import 'package:task4/animation.dart';
+import 'package:task4/register.dart';
 
 import 'mobilelogin.dart';
 
@@ -252,6 +253,28 @@ class _MyAppState extends State<MyApp> {
                                     ),
                                   ],
                                 ))),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Don't have an account?",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontFamily: "fonts/TrajanPro.ttf")),
+                      TextButton(
+                          onPressed: () {
+
+
+                            Navigator.of(context).push(animation(page: register()));
+                          },
+                          child: Text(
+                            "Register",
+                            style: TextStyle(fontSize: 15),
+                          ))
+                    ],
+                  ),
 
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.28,

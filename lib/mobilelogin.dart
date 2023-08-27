@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:task4/animation.dart';
+import 'package:task4/register.dart';
+import 'package:task4/verify.dart';
 
 class phone extends StatefulWidget {
   const phone({super.key});
@@ -105,14 +108,7 @@ class _phoneState extends State<phone> {
                             ),
                             inputDecoration: InputDecoration(
                               border: InputBorder.none,
-                                // enabledBorder: OutlineInputBorder(
-                                //     borderSide: BorderSide(
-                                //         color: Colors.white, width: 2),
-                                //     borderRadius: BorderRadius.circular(20)),
-                                // border: OutlineInputBorder(
-                                //     borderSide: BorderSide(
-                                //         color: Colors.white, width: 2),
-                                //     borderRadius: BorderRadius.circular(20)),
+
                                 hintText: "Enter Phone number",
                                 hintStyle: TextStyle(color: Colors.white60),
                                 prefixIcon: Icon(
@@ -133,44 +129,6 @@ class _phoneState extends State<phone> {
                         ],
                       ),
 
-
-
-
-                      // TextField(
-                      //   // autovalidateMode: AutovalidateMode.onUserInteraction,
-                      //
-                      //   style: TextStyle(color: Colors.white, fontSize: 15),
-                      //   decoration: InputDecoration(
-                      //     suffixIcon: InternationalPhoneNumberInput(
-                      //         cursorColor: Colors.white,
-                      //
-                      //         textStyle: TextStyle(
-                      //             color: Colors.white
-                      //
-                      //         ),
-                      //         onInputChanged: (value) {}),
-                      //       filled: true,
-                      //       contentPadding: EdgeInsets.all(50),
-                      //
-                      //       labelStyle: TextStyle(color: Colors.white),
-                      //       hintText: "Mobile no",
-                      //       hintStyle:
-                      //           TextStyle(color: Colors.white70, fontSize: 15),
-                      //       prefixIcon: Icon(
-                      //         Icons.phone_android_rounded,
-                      //         color: Colors.white,
-                      //       ),
-                      //       border: OutlineInputBorder(
-                      //           borderRadius:
-                      //               BorderRadius.all(Radius.circular(20)),
-                      //           borderSide: BorderSide(color: Colors.white)),
-                      //       enabledBorder: OutlineInputBorder(
-                      //           borderRadius:
-                      //               BorderRadius.all(Radius.circular(20)),
-                      //           borderSide: BorderSide(color: Colors.white))),
-                      //
-                      //   keyboardType: TextInputType.number,
-                      // )
                       ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.20,
@@ -195,18 +153,18 @@ class _phoneState extends State<phone> {
                                   borderRadius:
                                   BorderRadius.all(Radius.circular(10)))),
                           onPressed: () async {
+
                             setState(() {
                               isloading = true;
                             });
-                            setState(() async {
-                              if (_formKey.currentState!.validate()) {
-                              } else {
-                                setState(() {
-                                  isloading = false;
-                                });
-                              }
+                          await Future.delayed(Duration(seconds: 1));
+                          Navigator.of(context).push(animation(page: verfiy()));
+                            setState(() {
+                              isloading = false;
                             });
+
                           },
+
                           child: isloading
                               ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -249,7 +207,11 @@ class _phoneState extends State<phone> {
                               fontSize: 15,
                               fontFamily: "fonts/TrajanPro.ttf")),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+
+
+                            Navigator.of(context).push(animation(page: register()));
+                          },
                           child: Text(
                             "Register",
                             style: TextStyle(fontSize: 15),
