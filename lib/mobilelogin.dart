@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:task4/animation.dart';
 import 'package:task4/register.dart';
@@ -15,8 +17,15 @@ class phone extends StatefulWidget {
 class _phoneState extends State<phone> {
   final _formKey = GlobalKey<FormState>();
 
-  // FirebaseAuth instance = FirebaseAuth.instance;
+
+  TextEditingController phone = TextEditingController();
+  String input = "";
+  String phonenum = "";
+
+  String isoCode = 'PS';
+
   bool isloading = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -64,74 +73,79 @@ class _phoneState extends State<phone> {
                     ),
                   ),
                   Container(
-                      margin: EdgeInsets.only(left: 40, right: 40, top: 20),
-                      padding: EdgeInsets.only(
-                          left: 20, right: 20, bottom: 10, top: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(colors: [
-                            Colors.blueAccent,
-                            Colors.black,
-                            Colors.teal,
-                          ], transform: GradientRotation(9)),
-                          border: Border.all(color: Colors.white)),
-                      child: Stack(
-                        children: [
-                          InternationalPhoneNumberInput(
-                            onInputChanged: (value) {},
-
-                            initialValue: PhoneNumber(isoCode: 'PS'),
-                            textAlign: TextAlign.center,
-                            searchBoxDecoration: InputDecoration(
-
-                              labelText: "Search by country name or dial code",
-
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.black, width: 2),
-                                  borderRadius: BorderRadius.circular(20)),
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.black, width: 2),
-                                  borderRadius: BorderRadius.circular(20)),
-                            ),
-                            selectorTextStyle: TextStyle(color: Colors.white),
-                            cursorColor: Colors.white,
-                            formatInput: false,
-                            textStyle: TextStyle(color: Colors.white),
-                            selectorConfig: SelectorConfig(
-                              selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
-                              leadingPadding: 0,
-                              useEmoji: false,
-                              showFlags: true,
-                              setSelectorButtonAsPrefixIcon: false,
-                            ),
-                            inputDecoration: InputDecoration(
-                              border: InputBorder.none,
-
-                                hintText: "Enter Phone number",
-                                hintStyle: TextStyle(color: Colors.white60),
-                                prefixIcon: Icon(
-                                  Icons.phone_android_outlined,
-                                  color: Colors.white,
-                                )),
+                    margin: EdgeInsets.only(left: 40, right: 40, top: 20),
+                    padding: EdgeInsets.only(
+                        left: 20, right: 20, bottom: 10, top: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(colors: [
+                          Colors.blueAccent,
+                          Colors.black,
+                          Colors.teal,
+                        ], transform: GradientRotation(9)),
+                        border: Border.all(color: Colors.white)),
+                    child: Stack(
+                      children: [
+                        InternationalPhoneNumberInput(
+                          onInputChanged: (value) {
+                            setState(() {
+                              input = value.parseNumber();
+                              phonenum = value.phoneNumber.toString();
+                              isoCode = value.isoCode.toString();
+                              print(phonenum);
+                            });
+                          },
+                          initialValue: PhoneNumber(isoCode: isoCode),
+                          countrySelectorScrollControlled: true,
+                          formatInput: true,
+                          textAlign: TextAlign.center,
+                          searchBoxDecoration: InputDecoration(
+                            labelText: "Search by country name or dial code",
+                            enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(color: Colors.black, width: 2),
+                                borderRadius: BorderRadius.circular(20)),
+                            border: OutlineInputBorder(
+                                borderSide:
+                                BorderSide(color: Colors.black, width: 2),
+                                borderRadius: BorderRadius.circular(20)),
                           ),
-                          Positioned(
-                              // top: 800,
-                              left: 84,
-                              top: 4,
-
-                              child: Container(
-                                width: 2,
-                                height: 40,
+                          selectorTextStyle: TextStyle(color: Colors.white),
+                          cursorColor: Colors.white,
+                          textStyle: TextStyle(color: Colors.white),
+                          selectorConfig: SelectorConfig(
+                            selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                            leadingPadding: 0,
+                            // useEmoji: false,
+                            showFlags: true,
+                            // setSelectorButtonAsPrefixIcon: false,
+                          ),
+                          inputDecoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Enter Phone number",
+                              hintStyle: TextStyle(color: Colors.white60),
+                              prefixIcon: Icon(
+                                Icons.phone_android_outlined,
                                 color: Colors.white,
-                              ))
-                        ],
-                      ),
-
-                      ),
+                              )),
+                        ),
+                        Positioned(
+                          // top: 800,
+                            left: 84,
+                            top: 4,
+                            child: Container(
+                              width: 2,
+                              height: 40,
+                              color: Colors.white,
+                            ))
+                      ],
+                    ),
+                  ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.20,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.20,
                   ),
                   Container(
                       margin: EdgeInsets.only(top: 10),
@@ -153,24 +167,42 @@ class _phoneState extends State<phone> {
                                   borderRadius:
                                   BorderRadius.all(Radius.circular(10)))),
                           onPressed: () async {
+                            if (input.toString() != "") {
+                              setState(() {
+                                isloading = true;
+                              });
+                              await Future.delayed(Duration(seconds: 2));
+                              Navigator.of(context).pop();
+                              Navigator.of(context).push(animation(
+                                  page: verfiy(
+                                    numberphone: phonenum,
+                                  )));
+                              setState(() {
+                                isloading = false;
+                              });
+                            } else {
+                              print(phone.text);
+                              setState(() {
+                                isloading = false;
+                              });
 
-                            setState(() {
-                              isloading = true;
-                            });
-                          await Future.delayed(Duration(seconds: 1));
-                          Navigator.of(context).push(animation(page: verfiy()));
-                            setState(() {
-                              isloading = false;
-                            });
-
+                              Fluttertoast.showToast(
+                                  msg: "Phone number is empty",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.CENTER,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.blue,
+                                  textColor: Colors.black,
+                                  fontSize: 16.0);
+                            }
                           },
-
                           child: isloading
                               ? Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 CircularProgressIndicator(
-                                    color: Colors.white, strokeWidth: 3),
+                                    color: Colors.lightBlueAccent,
+                                    strokeWidth: 1),
                                 SizedBox(
                                   width: 10,
                                 ),
@@ -195,7 +227,9 @@ class _phoneState extends State<phone> {
                               ),
                             ],
                           ))),
-                  SizedBox(height: 30,),
+                  SizedBox(
+                    height: 30,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -208,9 +242,8 @@ class _phoneState extends State<phone> {
                               fontFamily: "fonts/TrajanPro.ttf")),
                       TextButton(
                           onPressed: () {
-
-
-                            Navigator.of(context).push(animation(page: register()));
+                            Navigator.of(context)
+                                .push(animation(page: register()));
                           },
                           child: Text(
                             "Register",

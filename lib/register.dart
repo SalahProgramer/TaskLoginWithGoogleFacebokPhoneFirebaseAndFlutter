@@ -1,19 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:regexpattern/regexpattern.dart';
 import 'package:task4/main.dart';
 
 import 'animation.dart';
+import 'dashboard.dart';
 import 'mobilelogin.dart';
-
-
-
-
-
-
-
-
 
 class register extends StatefulWidget {
   const register({super.key});
@@ -23,18 +18,78 @@ class register extends StatefulWidget {
 }
 
 class _registerState extends State<register> {
+  String? verify;
+
+  verifyPhoneNumber(String num) async {
+    FirebaseAuth instance = FirebaseAuth.instance;
+
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      timeout: Duration(seconds: 30),
+      phoneNumber: num.trim().toString(),
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        await instance.signInWithCredential(credential);
+        Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.blue,
+            textColor: Colors.black,
+            fontSize: 16.0);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          Fluttertoast.showToast(
+              msg: "The provided phone number is not valid",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.blue,
+              textColor: Colors.black,
+              fontSize: 16.0);
+        } else {
+          Fluttertoast.showToast(
+              msg: "SMS verification code request failed",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.blue,
+              textColor: Colors.black,
+              fontSize: 16.0);
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) async {
+        verify = verificationId;
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        verify = verificationId;
+        Fluttertoast.showToast(
+            msg: "Timed out waiting for SMS",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.blue,
+            textColor: Colors.black,
+            fontSize: 16.0);
+      },
+    );
+  }
+
   bool passowrd = true;
   bool conpassowrd = true;
   TextEditingController email = TextEditingController();
   TextEditingController pass = TextEditingController();
   TextEditingController conpass = TextEditingController();
+  FirebaseAuth instance = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
 
   // FirebaseAuth instance = FirebaseAuth.instance;
   bool isloading = false;
-  bool isloadingphone=false;
+  bool isloadingphone = false;
   bool visible = true;
+  String number = "";
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -50,6 +105,7 @@ class _registerState extends State<register> {
         //   elevation: 0,
         // ),
         body: Form(
+            key: _formKey,
             child: SafeArea(
               child: SingleChildScrollView(
                 child: Container(
@@ -85,12 +141,12 @@ class _registerState extends State<register> {
                             },
                             style: TextStyle(color: Colors.green, fontSize: 15),
                             decoration: InputDecoration(
-                              // filled: true,
-                              // fillColor: Colors.transparent,
+                                // filled: true,
+                                // fillColor: Colors.transparent,
 
                                 labelText: "Email",
-                                labelStyle:
-                                TextStyle(color: Colors.white, fontSize: 15),
+                                labelStyle: TextStyle(
+                                    color: Colors.white, fontSize: 15),
                                 hintStyle: TextStyle(color: Colors.white),
                                 prefixIcon: Icon(
                                   Icons.email,
@@ -98,16 +154,17 @@ class _registerState extends State<register> {
                                 ),
                                 border: OutlineInputBorder(
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                    borderSide: BorderSide(color: Colors.white)),
+                                        BorderRadius.all(Radius.circular(20)),
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
                                 enabledBorder: OutlineInputBorder(
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
+                                        BorderRadius.all(Radius.circular(20)),
                                     borderSide: BorderSide(color: Colors.white))
-                              // focusedBorder: OutlineInputBorder(
-                              //     borderRadius:
-                              //     BorderRadius.all(Radius.circular(20)))
-                            ),
+                                // focusedBorder: OutlineInputBorder(
+                                //     borderRadius:
+                                //     BorderRadius.all(Radius.circular(20)))
+                                ),
 
                             keyboardType: TextInputType.emailAddress,
                             autofillHints: [AutofillHints.email],
@@ -153,21 +210,23 @@ class _registerState extends State<register> {
                                 labelText: "Password",
                                 labelStyle: TextStyle(color: Colors.white),
                                 hintText:
-                                "Enter the password should at least 6 character ",
-                                hintStyle:
-                                TextStyle(color: Colors.white70, fontSize: 15),
+                                    "Enter the password should at least 6 character ",
+                                hintStyle: TextStyle(
+                                    color: Colors.white70, fontSize: 15),
                                 prefixIcon: Icon(
                                   Icons.password,
                                   color: Colors.white,
                                 ),
                                 border: OutlineInputBorder(
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                    borderSide: BorderSide(color: Colors.white)),
+                                        BorderRadius.all(Radius.circular(20)),
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
                                 enabledBorder: OutlineInputBorder(
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                    borderSide: BorderSide(color: Colors.white))),
+                                        BorderRadius.all(Radius.circular(20)),
+                                    borderSide:
+                                        BorderSide(color: Colors.white))),
 
                             keyboardType: TextInputType.visiblePassword,
                           )),
@@ -212,21 +271,23 @@ class _registerState extends State<register> {
                                 labelText: "Confirm Password",
                                 labelStyle: TextStyle(color: Colors.white),
                                 hintText:
-                                "Enter the password should at least 6 character ",
-                                hintStyle:
-                                TextStyle(color: Colors.white70, fontSize: 15),
+                                    "Enter the password should at least 6 character ",
+                                hintStyle: TextStyle(
+                                    color: Colors.white70, fontSize: 15),
                                 prefixIcon: Icon(
                                   Icons.password,
                                   color: Colors.white,
                                 ),
                                 border: OutlineInputBorder(
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                    borderSide: BorderSide(color: Colors.white)),
+                                        BorderRadius.all(Radius.circular(20)),
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
                                 enabledBorder: OutlineInputBorder(
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                    borderSide: BorderSide(color: Colors.white))),
+                                        BorderRadius.all(Radius.circular(20)),
+                                    borderSide:
+                                        BorderSide(color: Colors.white))),
 
                             keyboardType: TextInputType.visiblePassword,
                           )),
@@ -239,19 +300,18 @@ class _registerState extends State<register> {
                             left: 20, right: 20, bottom: 10, top: 10),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-
                             border: Border.all(color: Colors.white)),
                         child: Stack(
                           children: [
                             InternationalPhoneNumberInput(
-                              onInputChanged: (value) {},
-
+                              onInputChanged: (value) {
+                                number = value.phoneNumber.toString();
+                              },
                               initialValue: PhoneNumber(isoCode: 'PS'),
                               textAlign: TextAlign.center,
                               searchBoxDecoration: InputDecoration(
-
-                                labelText: "Search by country name or dial code",
-
+                                labelText:
+                                    "Search by country name or dial code",
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: Colors.black, width: 2),
@@ -266,7 +326,8 @@ class _registerState extends State<register> {
                               formatInput: false,
                               textStyle: TextStyle(color: Colors.white),
                               selectorConfig: SelectorConfig(
-                                selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                                selectorType:
+                                    PhoneInputSelectorType.BOTTOM_SHEET,
                                 leadingPadding: 0,
                                 useEmoji: false,
                                 showFlags: true,
@@ -274,7 +335,6 @@ class _registerState extends State<register> {
                               ),
                               inputDecoration: InputDecoration(
                                   border: InputBorder.none,
-
                                   hintText: "Enter Phone number",
                                   hintStyle: TextStyle(color: Colors.white60),
                                   prefixIcon: Icon(
@@ -283,10 +343,9 @@ class _registerState extends State<register> {
                                   )),
                             ),
                             Positioned(
-                              // top: 800,
+                                // top: 800,
                                 left: 84,
                                 top: 4,
-
                                 child: Container(
                                   width: 2,
                                   height: 40,
@@ -294,7 +353,6 @@ class _registerState extends State<register> {
                                 ))
                           ],
                         ),
-
                       ),
                       SizedBox(
                         height: 65,
@@ -310,20 +368,64 @@ class _registerState extends State<register> {
                                 Colors.black,
                                 Colors.teal,
                               ], transform: GradientRotation(9)),
-                              borderRadius: BorderRadius.all(Radius.circular(10))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.all(Radius.circular(10)))),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10)))),
                               onPressed: () async {
                                 setState(() {
                                   isloading = true;
                                 });
                                 setState(() async {
                                   if (_formKey.currentState!.validate()) {
+                                    if (conpass.text.toString() ==
+                                        pass.text.toString()) {
+                                      try {
+                                        UserCredential credential =
+                                            await instance
+                                                .createUserWithEmailAndPassword(
+                                                    email:
+                                                        email.text.toString(),
+                                                    password:
+                                                        pass.text.toString());
+                                        verifyPhoneNumber(number);
+                                        await Future.delayed(
+                                            Duration(seconds: 1));
+                                        isloading = false;
+
+                                        Navigator.of(context)
+                                            .push(animation(page: profile()));
+                                      } on FirebaseAuthException catch (e) {
+                                        if (e.code == "email-already-in-use") {
+                                          Fluttertoast.showToast(
+                                              msg: "The Email was used before",
+                                              toastLength: Toast.LENGTH_SHORT,
+                                              gravity: ToastGravity.CENTER,
+                                              timeInSecForIosWeb: 1,
+                                              backgroundColor: Colors.blue,
+                                              textColor: Colors.black,
+                                              fontSize: 16.0);
+                                          print("exeption");
+                                          setState(() {
+                                            isloading = false;
+                                          });
+                                        }
+                                      }
+                                    } else {
+                                      Fluttertoast.showToast(
+                                          msg: "Thr password not match",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.CENTER,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: Colors.blue,
+                                          textColor: Colors.black,
+                                          fontSize: 16.0);
+                                    }
                                   } else {
                                     setState(() {
                                       isloading = false;
@@ -333,35 +435,38 @@ class _registerState extends State<register> {
                               },
                               child: isloading
                                   ? Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CircularProgressIndicator(
-                                        color: Colors.white, strokeWidth: 3),
-                                    SizedBox(
-                                      width: 30,
-                                    ),
-                                    Text("Sign up".toUpperCase(),
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontFamily:
-                                            "fonts/TrajanPro.ttf"))
-                                  ])
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                          CircularProgressIndicator(
+                                              color: Colors.lightBlueAccent,
+                                              strokeWidth: 1),
+                                          SizedBox(
+                                            width: 30,
+                                          ),
+                                          Text("Sign up".toUpperCase(),
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontFamily:
+                                                      "fonts/TrajanPro.ttf"))
+                                        ])
                                   : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.login),
-                                  SizedBox(
-                                    width: 30,
-                                  ),
-                                  Text(
-                                    "Sign up".toUpperCase(),
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: "fonts/TrajanPro.ttf"),
-                                  ),
-                                ],
-                              ))),
-
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.login),
+                                        SizedBox(
+                                          width: 30,
+                                        ),
+                                        Text(
+                                          "Sign up".toUpperCase(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontFamily:
+                                                  "fonts/TrajanPro.ttf"),
+                                        ),
+                                      ],
+                                    ))),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -373,9 +478,8 @@ class _registerState extends State<register> {
                                   fontFamily: "fonts/TrajanPro.ttf")),
                           TextButton(
                               onPressed: () {
-
-
-                                Navigator.of(context).push(animation(page: MyApp()));
+                                Navigator.of(context)
+                                    .push(animation(page: MyApp()));
                               },
                               child: Text(
                                 "Login",
@@ -383,14 +487,11 @@ class _registerState extends State<register> {
                               ))
                         ],
                       ),
-
-
                     ],
                   ),
                 ),
               ),
             )),
-
       ),
     );
   }

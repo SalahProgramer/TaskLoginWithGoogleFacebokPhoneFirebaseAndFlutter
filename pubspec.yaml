@@ -30,14 +30,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-#  firebase_core: ^2.15.1
-#  firebase_auth: ^4.8.0
-#  cloud_firestore: ^4.9.0
+  firebase_core: ^2.15.1
+  firebase_auth: ^4.8.0
+  cloud_firestore: ^4.9.0
   fluttertoast: ^8.2.2
   validators:
   regexpattern: ^2.5.0
 #  provider:
-#  google_sign_in: ^6.1.4
+  google_sign_in: ^6.1.4
+  flutter_facebook_auth:
+  sms_autofill: ^2.3.0
+  cloud_functions: 4.0.13
+  firebase_analytics: 10.1.6
+  firebase_app_check: 0.1.1+14
+  firebase_storage: 11.0.16
+  firebase_crashlytics: 3.0.17
+  firebase_dynamic_links: 5.0.17
+  firebase_messaging: 14.3.0
+  firebase_performance: 0.9.0+16
+  firebase_remote_config: 3.0.15
   intl_phone_number_input: ^0.7.3+1
 
   # The following adds the Cupertino Icons font to your application.
@@ -70,6 +81,13 @@ flutter:
   assets:
      - images/background.jpg
      - images/blue.jpg
+     - images/backgroound.jpg
+     - images/3818136.png
+     - images/img.png
+     - images/task22.jpg
+     - images/res2.png
+     - images/pic.jpg
+     - images/d.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -24,6 +24,7 @@ if (flutterVersionName == null) {
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+apply plugin: 'com.google.gms.google-services'
 
 android {
     namespace "com.example.task4"
@@ -57,4 +58,14 @@ android {
 
 flutter {
     source '../..'
+}
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:32.2.3')
+    implementation 'com.facebook.android:facebook-android-sdk:latest.release'
+    implementation("com.google.firebase:firebase-auth")
+    implementation "com.google.android.gms:play-services-auth-api-phone:18.0.1"
+
+
+
+
 }
